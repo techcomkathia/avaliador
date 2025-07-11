@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliador de Projetos React</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f8f8; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+        h1, h2 { color: #333; }
+        .section { margin-bottom: 20px; }
+        label { display: block; margin-top: 8px; }
+        input[type="radio"] { margin-right: 6px; }
+        .extra-options { margin-left: 20px; display: none; }
+        textarea, select, button { width: 100%; padding: 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        textarea[readonly] { background: #eee; }
+        .extra-options{background-color: rgb(251, 202, 198); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Avaliador de Projetos React</h1>
+        <div class="section">
+            <label>Tipo de trabalho:</label>
+            <select id="tipoTrabalho">
+                <option value="individual">Individual</option>
+                <option value="equipe">Equipe (até 3 integrantes)</option>
+            </select>
+        </div>
+        <div class="section">
+            <h2>Critérios obrigatórios</h2>
+
+            <div class="criterio" data-peso="2.0" data-nome="Componentização" data-genero="feminino">
+                <label>Componentização:</label>
+                <label><input type="radio" name="Componentização" value="100"> Atendeu</label>
+                <label><input type="radio" name="Componentização" value="50"> Parcial</label>
+                <label><input type="radio" name="Componentização" value="0"> Não atendeu</label>
+            </div>
+
+            <div class="criterio" data-peso="1.0" data-nome="Uso do Router" data-genero="masculino">
+                <label>Uso do Router:</label>
+                <label><input type="radio" name="Uso do Router" value="100"> Atendeu</label>
+                <label><input type="radio" name="Uso do Router" value="50"> Parcial</label>
+                <label><input type="radio" name="Uso do Router" value="0"> Não atendeu</label>
+            </div>
+
+            <div class="criterio" data-peso="1.5" data-nome="Uso dos Hooks" data-genero="masculino">
+                <label>Uso dos Hooks:</label>
+                <label><input type="radio" name="Uso dos Hooks" value="100" onchange="mostrarHooks(false)"> Atendeu</label>
+                <label><input type="radio" name="Uso dos Hooks" value="50" onchange="mostrarHooks(true)"> Parcial</label>
+                <label><input type="radio" name="Uso dos Hooks" value="0" onchange="mostrarHooks(false)"> Não atendeu</label>
+                <div class="extra-options" id="hooksAusentes">
+                    <label><input type="checkbox" value="useState"> useState</label>
+                    <label><input type="checkbox" value="useEffect"> useEffect</label>
+                </div>
+            </div>
+
+            <div class="criterio" data-peso="2.0" data-nome="Layout" data-genero="masculino">
+                <label>Layout:</label>
+                <label><input type="radio" name="Layout" value="100" onchange="mostrarPaginas(false)"> Atendeu</label>
+                <label><input type="radio" name="Layout" value="50" onchange="mostrarPaginas(true)"> Parcial</label>
+                <label><input type="radio" name="Layout" value="0" onchange="mostrarPaginas(false)"> Não atendeu</label>
+                <div class="extra-options" id="paginasFaltantes">
+                    <label><input type="checkbox" value="home"> Página Home</label>
+                    <label><input type="checkbox" value="listarProdutos"> Página Listar Produtos</label>
+                    <label><input type="checkbox" value="detalheProduto"> Página Detalhe Produto</label>
+                </div>
+            </div>
+
+            <div class="criterio" data-peso="2.0" data-nome="Construção da lógica" data-genero="feminino">
+                <label>Construção da lógica:</label>
+                <label><input type="radio" name="Construção da lógica" value="100"> Atendeu</label>
+                <label><input type="radio" name="Construção da lógica" value="50"> Parcial</label>
+                <label><input type="radio" name="Construção da lógica" value="0"> Não atendeu</label>
+            </div>
+
+            <div class="criterio" data-peso="1.5" data-nome="Trabalho em equipe" data-genero="masculino">
+                <label>Trabalho em equipe:</label>
+                <label><input type="radio" name="Trabalho em equipe" value="100"> Atendeu</label>
+                <label><input type="radio" name="Trabalho em equipe" value="50"> Parcial</label>
+                <label><input type="radio" name="Trabalho em equipe" value="0"> Não atendeu</label>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Extras</h2>
+            <label><input type="checkbox" id="api"> Consumo de API (+0.5)</label>
+            <label><input type="checkbox" id="biblioteca"> Uso de biblioteca externa (+0.5)</label>
+            <label><input type="checkbox" id="deploy"> Deploy do projeto (+0.5)</label>
+        </div>
+
+        <div class="section">
+            <label>Observações finais:</label>
+            <textarea id="observacoes" rows="4"></textarea>
+        </div>
+
+        <button onclick="gerarDevolutiva()">Gerar devolutiva</button>
+        <div class="section">
+            <h2>Devolutiva:</h2>
+            <textarea id="resultado" rows="10" readonly></textarea>
+            <button onclick="copiarTexto()">Copiar texto</button>
+        </div>
+    </div>
+
+    <script>
+        function mostrarHooks(show) {
+            document.getElementById('hooksAusentes').style.display = show ? 'block' : 'none';
+        }
+
+        function mostrarPaginas(show) {
+            document.getElementById('paginasFaltantes').style.display = show ? 'block' : 'none';
+        }
+
+        function validarCamposObrigatorios() {
+            const criterios = document.querySelectorAll('.criterio');
+            for (let criterio of criterios) {
+                const radios = criterio.querySelectorAll('input[type="radio"]');
+                const selecionado = Array.from(radios).some(r => r.checked);
+                if (!selecionado) {
+                    const nome = criterio.dataset.nome || "Critério não identificado";
+                    alert(`Por favor, selecione uma opção para "${nome}".`);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function gerarDevolutiva() {
+
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+            const tipo = document.getElementById('tipoTrabalho').value;
+            const criterios = document.querySelectorAll('.criterio');
+            let texto = tipo === 'individual' ? 'O trabalho foi desenvolvido individualmente.\n' : 'O trabalho foi desenvolvido em equipe, com até três integrantes.\n';
+            let total = 0;
+
+            criterios.forEach(c => {
+                let nome = c.dataset.nome;
+                let genero = c.dataset.genero || 'feminino';
+                let artigo = genero === 'masculino' ? 'O' : 'A';
+                let verbo = genero === 'masculino' ? 'implementado' : 'implementada';
+                let parcial = genero === 'masculino' ? 'atendido' : 'atendida';
+                let naoAtendeu = 'atendeu aos requisitos esperados';
+
+                let peso = parseFloat(c.dataset.peso);
+                let inputSelecionado = c.querySelector('input[type="radio"]:checked');
+                let pct = inputSelecionado ? parseInt(inputSelecionado.value) : 0;
+
+                let pontos = 0;
+
+                if (nome === 'Layout' && pct === 50) {
+                    let faltantes = document.querySelectorAll('#paginasFaltantes input[type="checkbox"]:checked').length;
+                    pontos = peso * ((3 - faltantes) / 3);
+                } else {
+                    pontos = peso * (pct / 100);
+                }
+
+                total += pontos;
+
+                let frase = '';
+                if (nome === 'Uso dos Hooks' && pct === 50) {
+                    let hooks = Array.from(document.querySelectorAll('#hooksAusentes input[type="checkbox"]:checked')).map(cb => cb.value);
+                    frase = `O uso dos hooks foi parcial. Não foi utilizado: ${hooks.join(', ')}.`;
+                }
+                else if (nome === 'Trabalho em equipe' && tipo === 'individual') {
+                    frase = pct === 100
+                        ? 'Mesmo sendo um trabalho individual, ficou evidente organização e responsabilidade no desenvolvimento do projeto.'
+                        : pct === 50
+                        ? 'Por ser um trabalho individual, foi possível notar algumas dificuldades na organização e execução das etapas do projeto.'
+                        : 'O projeto individual não demonstrou um planejamento adequado, faltando atenção a pontos importantes da execução.';
+                } else {
+                    if (!frase) {
+                        if (pct === 100) frase = `${artigo} ${nome.toLowerCase()} foi bem ${verbo}.`;
+                        else if (pct === 50) frase = `${artigo} ${nome.toLowerCase()} foi parcialmente ${parcial}.`;
+                        else frase = `${artigo} ${nome.toLowerCase()} não ${naoAtendeu}.`;
+                    }
+                }
+
+                texto += frase + '\n';
+            });
+
+            let extras = 0;
+            if (total < 10) {
+                if (document.getElementById('api').checked) { texto += 'O projeto apresentou consumo de API.\n'; extras += 0.5; }
+                if (document.getElementById('biblioteca').checked) { texto += 'Foi utilizada uma biblioteca externa.\n'; extras += 0.5; }
+                if (document.getElementById('deploy').checked) { texto += 'O projeto foi publicado (deploy).\n'; extras += 0.5; }
+            }
+
+            total = Math.min(10, total + extras);
+            texto += `Pontuação final: ${total.toFixed(1)}.`;
+            if (total >= 10) texto += ' Os critérios obrigatórios somaram o total de 10 pontos, dispensando extras.';
+
+            document.getElementById('resultado').value = texto + '\n' + document.getElementById('observacoes').value;
+        }
+
+        function copiarTexto() {
+            const area = document.getElementById('resultado');
+            area.select();
+            document.execCommand('copy');
+            alert('Texto copiado para a área de transferência!');
+        }
+    </script>
+</body>
+</html>
