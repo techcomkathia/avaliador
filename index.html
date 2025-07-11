@@ -199,11 +199,13 @@
 
             const url = document.getElementById('repoUrl').value.trim();
             if (url) {
-                texto += `\\nRepositório do projeto: ${url}`;
+                texto += `\nRepositório do projeto: ${url}`;
             }
 
-            document.getElementById('resultado').value = texto + '\\n' + document.getElementById('observacoes').value;
+            document.getElementById('resultado').value = texto + '\n' + document.getElementById('observacoes').value;
         }
+
+
 
         function copiarTexto() {
             const area = document.getElementById('resultado');
