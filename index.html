@@ -13,7 +13,7 @@
         label { display: block; margin-top: 8px; }
         input[type="radio"] { margin-right: 6px; }
         .extra-options { margin-left: 20px; display: none; }
-        textarea, select, button { width: 100%; padding: 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        textarea, select, button, input[type="text"] { width: 95%; padding: 8px; margin-top: 8px; border-radius: 4px; border: 1px solid #ccc; }
         textarea[readonly] { background: #eee; }
         .extra-options{background-color: rgb(251, 202, 198); }
 
@@ -22,6 +22,10 @@
 <body>
     <div class="container">
         <h1>Avaliador de Projetos React</h1>
+        <div class="section">
+            <label>Respositório:</label>
+            <input type="text" id="repoUrl">
+        </div>
         <div class="section">
             <label>Tipo de trabalho:</label>
             <select id="tipoTrabalho">
@@ -193,7 +197,12 @@
             texto += `Pontuação final: ${total.toFixed(1)}.`;
             if (total >= 10) texto += ' Os critérios obrigatórios somaram o total de 10 pontos, dispensando extras.';
 
-            document.getElementById('resultado').value = texto + '\n' + document.getElementById('observacoes').value;
+            const url = document.getElementById('repoUrl').value.trim();
+            if (url) {
+                texto += `\\nRepositório do projeto: ${url}`;
+            }
+
+            document.getElementById('resultado').value = texto + '\\n' + document.getElementById('observacoes').value;
         }
 
         function copiarTexto() {
